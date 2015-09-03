@@ -6,22 +6,25 @@ defmodule SymbolicExpression.Parser do
   @escaped_characters [?"]
 
   @doc """
-  Parses an s-expression held in a string. Returns `nil` when the string does
-  not contain a valid s-expression. See [Wikipedia](https://en.wikipedia.org/wiki/S-expression)
-  for more details about s-expressions.
+  Parses an s-expression held in a string. Returns `{:ok, result}` on success,
+  `{:error, reason}` when the string does not contain a valid s-expression.
+  See [Wikipedia](https://en.wikipedia.org/wiki/S-expression) for more details
+  about s-expressions.
 
   ## Example
 
       iex> alias SymbolicExpression.Parser
       iex> Parser.parse ~S|(1 2 3)|
-      [1, 2, 3]
+      {:ok, [1, 2, 3]}
+      iex> Parser.parse "invalid"
+      {:error, :bad_arg}
   """
-  def parse(exp) do
+  def parse(exp) when is_binary(exp) do
     try do
-      parse! exp
+      {:ok, parse!(exp)}
     rescue
       _ in [ArgumentError] ->
-        nil
+        {:error, :bad_arg}
     end
   end
 
