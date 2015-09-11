@@ -107,8 +107,8 @@ defmodule SymbolicExpression.Parser do
   end
 
   defp process_int(term) do
-    case term |> String.to_char_list |> :string.to_integer do
-      {int, []} ->
+    case Integer.parse(term) do
+      {int, ""} ->
         int
       _ ->
         nil
@@ -116,8 +116,8 @@ defmodule SymbolicExpression.Parser do
   end
 
   defp process_float(term) do
-    case term |> String.to_char_list |> :string.to_float do
-      {float, []} ->
+    case Float.parse(term) do
+      {float, ""} ->
         float
       _ ->
         nil
