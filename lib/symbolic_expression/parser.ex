@@ -1,5 +1,6 @@
 defmodule SymbolicExpression.Parser do
   alias SymbolicExpression.Parser.State
+  require Logger
 
   @whitespace [?\n, ?\s, ?\t]
   @string_terminals [?"]
@@ -23,7 +24,8 @@ defmodule SymbolicExpression.Parser do
     try do
       {:ok, parse!(exp)}
     rescue
-      _ in [ArgumentError] ->
+      error in [ArgumentError] ->
+        Logger.error "Failed to parse expression: '#{exp}' with error: '#{inspect error}'"
         {:error, :bad_arg}
     end
   end
@@ -47,6 +49,30 @@ defmodule SymbolicExpression.Parser do
   """
   def parse!(""), do: []
   def parse!(exp) when is_binary(exp), do: _parse!(State.new exp)
+
+  @doc """
+  Like `parse/1` except the input is a file path instead of a binary.
+  """
+  def parse_file(file) when is_binary(file) do
+    try do
+      {:ok, parse_file!(file)}
+    rescue
+      error in [ArgumentError] ->
+        Logger.error "Failed to parse expression in file: '#{file}' with error: '#{inspect error}'"
+        {:error, :bad_arg}
+      error in [File.Error] ->
+        Logger.error "Failed to parse expression in file: '#{file}' with error: '#{inspect error}'"
+        {:error, :bad_file}
+    end
+  end
+
+  @doc """
+  Like `parse_file/1` except raises `ArgumentError` when the string does not
+  contain a valid s-expression or `File.Error` if the file can't be read.
+  """
+  def parse_file!(file) when is_binary(file) do
+    file |> Path.expand |> File.read! |> parse!
+  end
 
   # New scope
   defp _parse!(s = %State{expression: "(" <> rest, in_term: false, paren_count: count, result: result}) when count > 0 or result == [[]] do
