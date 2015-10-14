@@ -3,6 +3,7 @@ defmodule SymbolicExpression.Parser do
   require Logger
 
   @whitespace [?\n, ?\s, ?\t]
+  @end_comment [?\n]
   @string_terminals [?"]
   @escaped_characters [?"]
 
@@ -74,7 +75,22 @@ defmodule SymbolicExpression.Parser do
     file |> Path.expand |> File.read! |> parse!
   end
 
-  # New scope
+  # Start comment.
+  defp _parse!(s = %State{expression: ";" <> rest, in_term: false, in_comment: false}) do
+    _parse! %State{s | expression: rest, in_comment: true}
+  end
+
+  # End comment.
+  defp _parse!(s = %State{expression: << c :: utf8 >> <> rest, in_comment: true}) when c in @end_comment do
+    _parse! %State{s | expression: rest, in_comment: false}
+  end
+
+  # In comment.
+  defp _parse!(s = %State{expression: << c :: utf8 >> <> rest, in_comment: true}) do
+    _parse! %State{s | expression: rest}
+  end
+
+  # New scope.
   defp _parse!(s = %State{expression: "(" <> rest, in_term: false, paren_count: count, result: result}) when count > 0 or result == [[]] do
     _parse! %State{s | expression: rest, paren_count: count + 1, result: [[] | s.result]}
   end

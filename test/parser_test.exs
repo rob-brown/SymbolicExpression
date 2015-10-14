@@ -86,6 +86,50 @@ defmodule SymbolicExpressionParserTest do
     assert_raise ArgumentError, fn -> Parser.parse!(exp) end
   end
 
+  test "fail to parse just comment" do
+    assert_raise ArgumentError, fn -> ~p"; Just a comment" end
+  end
+
+  test "parse s-expression with starting comment" do
+    assert [1, 2, 3] == ~p"""
+    ; A starting comment
+    (1 2 3)
+    """
+  end
+
+  test "parse s-expression with ending comment" do
+    assert [1, 2, 3] == ~p"""
+    (1 2 3)
+    ; An ending comment
+    """
+  end
+
+  test "parse s-expression with intermediate comment" do
+    assert [1, 2, 3] == ~p"""
+    (1
+    ; An intermediate comment
+    2
+    ; Another intermediate comment
+    3)
+    """
+  end
+
+  test "parse s-expression with inline comment" do
+    assert [1, 2, 3] == ~p"""
+    (1 ; A one
+    2 ; A two
+    3) ; A three
+    """
+  end
+
+  test "parse s-expression with comment containing s-expression" do
+    assert [1, 2, 3] == ~p"""
+    ; (do not parse)
+    (1 2 3)
+    ; (4 5 6)
+    """
+  end
+
   test "parse file" do
     expected = [:a, [:b, "test", [:c, :one], [:c, :two]]]
     file = [__DIR__, "test.sexp"] |> Path.join |> Path.expand
