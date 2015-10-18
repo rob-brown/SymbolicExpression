@@ -1,12 +1,9 @@
 defmodule SymbolicExpressionParserTest do
   use ExUnit.Case, async: true
   alias SymbolicExpression.Parser
-  import SymbolicExpression.Parser.Sigil
+  import SymbolicExpression.Sigil
 
   @moduletag :parser
-
-  doctest SymbolicExpression.Parser
-  doctest SymbolicExpression.Parser.Sigil
 
   test "parse empty string" do
     assert ~p|| == []
