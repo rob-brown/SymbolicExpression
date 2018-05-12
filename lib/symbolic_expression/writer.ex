@@ -57,7 +57,6 @@ defmodule SymbolicExpression.Writer do
   defp format(x) when is_atom(x), do: Atom.to_string(x)
   defp format(x) when is_integer(x), do: Integer.to_string(x)
   defp format(x) when is_float(x), do: :erlang.float_to_binary(x, [{:decimals, 8}, :compact])
-  #defp format(x) when is_float(x), do: Float.to_string(x, [compact: true, decimals: 8])
   defp format(x) do
     raise ArgumentError, message: """
       Unable to format "#{inspect x}" for s-expression.

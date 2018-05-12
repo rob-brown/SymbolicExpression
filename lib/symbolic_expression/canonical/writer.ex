@@ -58,7 +58,6 @@ defmodule SymbolicExpression.Canonical.Writer do
   defp format(x) when is_atom(x), do: x |> Atom.to_string |> _format
   defp format(x) when is_integer(x), do: x |> Integer.to_string |> _format
   defp format(x) when is_float(x) do
-    #x |> Float.to_string([compact: true, decimals: 8]) |> _format
     :erlang.float_to_binary(x, [:compact, {:decimals, 8}])
   end
   defp format(x) when is_binary(x) do
