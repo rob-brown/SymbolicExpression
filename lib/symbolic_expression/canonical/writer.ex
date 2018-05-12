@@ -43,7 +43,7 @@ defmodule SymbolicExpression.Canonical.Writer do
   def write!(exp) when is_list(exp), do: _write!(exp, "")
 
   defp _write!([head | tail], result), do: _write!(tail, result <> format(head))
-  defp _write!([], result), do: result |> String.strip |> (&"(#{&1})").()
+  defp _write!([], result), do: result |> String.trim |> (&"(#{&1})").()
 
   # Catch all for errors.
   defp _write!(exp, result) do
@@ -58,7 +58,8 @@ defmodule SymbolicExpression.Canonical.Writer do
   defp format(x) when is_atom(x), do: x |> Atom.to_string |> _format
   defp format(x) when is_integer(x), do: x |> Integer.to_string |> _format
   defp format(x) when is_float(x) do
-    x |> Float.to_string([compact: true, decimals: 8]) |> _format
+    #x |> Float.to_string([compact: true, decimals: 8]) |> _format
+    :erlang.float_to_binary(x, [:compact, {:decimals, 8}])
   end
   defp format(x) when is_binary(x) do
     "[24:text/plain;charset=utf-8]#{_format x}"
