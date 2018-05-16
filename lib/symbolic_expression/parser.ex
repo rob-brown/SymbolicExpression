@@ -86,7 +86,7 @@ defmodule SymbolicExpression.Parser do
   end
 
   # In comment.
-  defp _parse!(s = %State{expression: << c :: utf8 >> <> rest, in_comment: true}) do
+  defp _parse!(s = %State{expression: << _c :: utf8 >> <> rest, in_comment: true}) do
     _parse! %State{s | expression: rest}
   end
 
